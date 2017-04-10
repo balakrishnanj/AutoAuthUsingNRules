@@ -1,8 +1,9 @@
 ﻿using Microsoft.Owin;
 using Owin;
+using RuleApiApplication;
 using RuleApiApplication.Business;
 
-[assembly: OwinStartup(typeof(RuleApiApplication.Startup))]
+[assembly: OwinStartup(typeof (Startup))]
 
 namespace RuleApiApplication
 {
@@ -11,7 +12,7 @@ namespace RuleApiApplication
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
-            AutoAuthorizationRuleRepository.LoadRuleSets();
+            DecisionRuleBootstrapper.Boostarp();
         }
     }
 }

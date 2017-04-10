@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using NRules.RuleModel;
 using RuleApiApplication.Messages;
@@ -8,23 +7,24 @@ namespace RuleApiApplication.Business
 {
     public static class RuleBuilder
     {
-        public static IRuleDefinition Build(AutoAuthorizationRule autoAuthorizationRule)
+        public static IRuleDefinition Build(DecisionRule decisionRule)
         {
             var builder = new NRules.RuleModel.Builders.RuleBuilder();
-            //builder.Repeatability(RuleRepeatability.NonRepeatable);
-            builder.Name(autoAuthorizationRule.Name);
+            builder.Repeatability(RuleRepeatability.NonRepeatable);
+            builder.Name(decisionRule.Name);
 
-            var autoAuthorizationPattern = builder.LeftHandSide().Pattern(typeof(AutoAuthorizationContract), "autoAuthContract");
-            Expression<Func<AutoAuthorizationContract, bool>> autoAuthExpression = autoAuthContract =>
-               autoAuthContract.ClientId == autoAuthorizationRule.ClientId &&
-               autoAuthContract.LobId == autoAuthorizationRule.LobId &&
-               autoAuthContract.AuthTypeId == autoAuthorizationRule.AuthTypeId;
+            var autoAuthorizationPattern = builder.LeftHandSide()
+                .Pattern(typeof (DecisionRuleRequest), "autoAuthContract");
+            Expression<Func<DecisionRuleRequest, bool>> autoAuthExpression = autoAuthContract =>
+                autoAuthContract.ClientId == decisionRule.ClientId &&
+                autoAuthContract.LobId == decisionRule.LobId &&
+                autoAuthContract.AuthTypeId == decisionRule.AuthTypeId;
 
             autoAuthExpression = autoAuthExpression
-                .AppendRules(autoAuthorizationRule);
+                .AppendRules(decisionRule);
 
             autoAuthorizationPattern.Condition(autoAuthExpression);
-            Expression<Action<IContext>> result = (ctx) => Trace.WriteLine($"Success: {autoAuthorizationRule.Name}");
+            Expression<Action<IContext>> result = (ctx) => new RuleEngine().WhenRuleFires(ctx, decisionRule);
             builder.RightHandSide().Action(result);
             return builder.Build();
         }

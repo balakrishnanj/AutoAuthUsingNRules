@@ -241,8 +241,8 @@
     <Compile Include="Business\RuleBuilder.cs" />
     <Compile Include="Business\RuleEngine.cs" />
     <Compile Include="Business\RuleExtension.cs" />
-    <Compile Include="Business\AutoAuthorizationRuleRepository.cs" />
-    <Compile Include="Business\RuleFactory.cs" />
+    <Compile Include="Business\DecisionRuleRepository.cs" />
+    <Compile Include="Business\DecisionRuleBootstrapper.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AutoAuthorizationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -250,9 +250,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Messages\AutoAuthorizationContract.cs" />
-    <Compile Include="Messages\AutoAuthorizationRule.cs" />
-    <Compile Include="Messages\AutoAuthorizationRulesetStore.cs" />
+    <Compile Include="Messages\DecisionRuleRequest.cs" />
+    <Compile Include="Messages\DecisionRule.cs" />
+    <Compile Include="Messages\DecisionRulesetStore.cs" />
+    <Compile Include="Messages\DecisionRuleResponse.cs" />
     <Compile Include="Messages\RuleStore.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -260,16 +261,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
-    <Compile Include="Rules\DiagnosisCodeRuleBuilder.cs" />
-    <Compile Include="Rules\IAutoAuthorizationRuleBuilder.cs" />
-    <Compile Include="Rules\PatientAgeRuleBuilder.cs" />
-    <Compile Include="Rules\PatientGenderRuleBuilder.cs" />
-    <Compile Include="Rules\PlaceOfServiceRuleBuilder.cs" />
-    <Compile Include="Rules\ProcedureCodeRuleBuilder.cs" />
-    <Compile Include="Rules\RequestedAmountRuleBuilder.cs" />
-    <Compile Include="Rules\RequestingProviderSpecialityRuleBuilder.cs" />
-    <Compile Include="Rules\ReviewTypeRuleBuilder.cs" />
-    <Compile Include="Rules\VendorProviderSpecialityBuilder.cs" />
+    <Compile Include="Rules\DiagnosisCodeRule.cs" />
+    <Compile Include="Rules\IDecisionEngineRule.cs" />
+    <Compile Include="Rules\PatientAgeRule.cs" />
+    <Compile Include="Rules\PatientGenderRule.cs" />
+    <Compile Include="Rules\PlaceOfServiceRule.cs" />
+    <Compile Include="Rules\ProcedureCodeRule.cs" />
+    <Compile Include="Rules\RequestedAmountRule.cs" />
+    <Compile Include="Rules\RequestingProviderSpecialityRule.cs" />
+    <Compile Include="Rules\ReviewTypeRule.cs" />
+    <Compile Include="Rules\VendorProviderSpeciality.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +304,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Messages\RuleConstant.cs" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

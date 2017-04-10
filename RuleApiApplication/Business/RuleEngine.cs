@@ -1,38 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using NRules;
-using NRules.Diagnostics;
+using NRules.RuleModel;
 using RuleApiApplication.Messages;
+using WebGrease.Css.Extensions;
 
 namespace RuleApiApplication.Business
 {
     public class RuleEngine
     {
-        public static readonly Lazy<ISessionFactory> sessionFactory = new Lazy<ISessionFactory>(() => new AutoAuthorizationRuleRepository().Compile());
-        public async Task ExecuteRuleAsync(AutoAuthorizationContract autoAuthRequest)
+        private List<DecisionRuleResponse> _decisionRuleResponses;
+        public async Task ExecuteRuleAsync(DecisionRuleRequest autoAuthRequest)
         {
             await Task.Factory.StartNew(() =>
             {
-                ISessionFactory sessionFactory = new AutoAuthorizationRuleRepository().Compile();
+                var sessionFactory = new DecisionRuleRepository().Compile();
                 var session = sessionFactory.CreateSession();
-                session.Events.RuleFiredEvent += OnRuleFired;
                 session.Insert(autoAuthRequest);
                 session.Fire();
             });
         }
 
-        private void OnRuleFired(object sender, AgendaEventArgs e)
+        public void WhenRuleFires(IContext context,DecisionRule decisionRule)
         {
-           
+            Trace.WriteLine($"Success. Done executing rule {decisionRule.Name}");
+            _decisionRuleResponses = _decisionRuleResponses ?? new List<DecisionRuleResponse>();
+            _decisionRuleResponses.Add(new DecisionRuleResponse
+            {
+                ApprovedPayLevelId = decisionRule.ApprovedPayLevelId,
+                ApprovalReasonId = decisionRule.ApprovalReasonId,
+                DecisionTypeId = decisionRule.DecisionTypeId,
+                RuleId = decisionRule.RuleId,
+                ApprovalRationale = decisionRule.ApprovalRationale ?? string.Empty
+            });
+            context.Halt();
         }
 
-        public void ExecuteRule(AutoAuthorizationContract autoAuthorizationContract)
+        public List<DecisionRuleResponse> ExecuteRule(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
-            if(autoAuthorizationContract == null)throw new ArgumentNullException();
-            var session = sessionFactory.Value.CreateSession();
-            session.Events.RuleFiredEvent += OnRuleFired;
-            session.Insert(autoAuthorizationContract);
-            session.Fire();
+            if (autoAuthorizationDtos == null) throw new ArgumentNullException();
+            autoAuthorizationDtos.ForEach(r =>
+            {
+                var session = DecisionRuleBootstrapper.RuleSets["Test"].CreateSession();
+                session.Insert(r);
+                session.Fire(1);
+            });
+
+            return _decisionRuleResponses;
         }
     }
 }
