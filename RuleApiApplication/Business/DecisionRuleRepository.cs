@@ -9,21 +9,16 @@ namespace RuleApiApplication.Business
     {
         public IEnumerable<IRuleSet> GetRuleSets()
         {
-            return new List<IRuleSet> {DecisionRulesetStore.Rules};
+            return new List<IRuleSet> { DecisionRulesetStore.Rules };
         }
 
         public static void LoadRuleSets()
         {
             DecisionRulesetStore.Rules = new RuleSet("Test");
-            var count = 100;
-            while (count > 0)
-            {
-                var ruleDefinitions = RuleStore
-                    .Rules
-                    .Select(autoAuthorizationRule => RuleBuilder.Build(autoAuthorizationRule)).ToList();
-                DecisionRulesetStore.Rules.Add(ruleDefinitions);
-                count--;
-            }
+            var ruleDefinitions = RuleStore
+                .Rules
+                .Select(autoAuthorizationRule => RuleBuilder.Build(autoAuthorizationRule)).ToList();
+            DecisionRulesetStore.Rules.Add(ruleDefinitions);
         }
     }
 }
