@@ -270,7 +270,7 @@
     <Compile Include="Rules\RequestedAmountRule.cs" />
     <Compile Include="Rules\RequestingProviderSpecialityRule.cs" />
     <Compile Include="Rules\ReviewTypeRule.cs" />
-    <Compile Include="Rules\VendorProviderSpeciality.cs" />
+    <Compile Include="Rules\VendorProviderSpecialityRule.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

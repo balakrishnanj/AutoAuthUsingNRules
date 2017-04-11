@@ -41,6 +41,18 @@ namespace RuleApiApplication.Business
         public List<DecisionRuleResponse> ExecuteRule(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
             if (autoAuthorizationDtos == null) throw new ArgumentNullException();
+            autoAuthorizationDtos.ForEach(r =>
+            {
+                var session = DecisionRuleBootstrapper.RuleSets["Test"].CreateSession();
+                session.Insert(r);
+                session.Fire(1);
+            });
+            return _decisionRuleResponses;
+        }
+
+        public List<DecisionRuleResponse> ExecuteRuleParllel(List<DecisionRuleRequest> autoAuthorizationDtos)
+        {
+            if (autoAuthorizationDtos == null) throw new ArgumentNullException();
             if (autoAuthorizationDtos.Count > 5)
             {
                 var groupedDtos = autoAuthorizationDtos.Select((dto, index) => new {dto, index})

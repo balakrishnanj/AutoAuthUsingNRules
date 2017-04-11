@@ -16,7 +16,7 @@ namespace RuleApiApplication.Messages
         public HashSet<string> ProcedureCodes { get; set; }
         public string RequestingProviderSpecialityCode { get; set; }
         public bool? IsRequestProviderInNetwork { get; set; }
-        public string VendorProviderSpecialityCode { get; set; }
+        public HashSet<string> VendorProviderSpecialityCodes { get; set; }
         public bool? IsVendorProviderInNetwork { get; set; }
         public int? ReviewTypeId { get; set; }
         public int? MaxUnits { get; set; }

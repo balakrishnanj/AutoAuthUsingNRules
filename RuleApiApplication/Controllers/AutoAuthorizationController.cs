@@ -12,7 +12,7 @@ namespace RuleApiApplication.Controllers
         [HttpPost]
         public HttpResponseMessage Validate(List<DecisionRuleRequest> contracts)
         {
-            var responses = new RuleEngine().ExecuteRule(contracts);
+            var responses = new RuleEngine().ExecuteRuleParllel(contracts);
             return Request.CreateResponse(responses);
         }
     }
