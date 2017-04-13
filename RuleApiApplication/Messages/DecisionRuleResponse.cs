@@ -3,6 +3,7 @@
     public class DecisionRuleResponse
     {
         public int RuleId { get; set; }
+        public int ReviewId { get; set; }
         public int DecisionTypeId { get; set; }
         public int ApprovalReasonId { get; set; }
         public int? ApprovedPayLevelId { get; set; }

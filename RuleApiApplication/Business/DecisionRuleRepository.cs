@@ -17,7 +17,7 @@ namespace RuleApiApplication.Business
             DecisionRulesetStore.Rules = new RuleSet("Test");
             var ruleDefinitions = RuleStore
                 .Rules
-                .Select(autoAuthorizationRule => RuleBuilder.Build(autoAuthorizationRule)).ToList();
+                .Select(RuleBuilder.Build).ToList();
             DecisionRulesetStore.Rules.Add(ruleDefinitions);
         }
     }

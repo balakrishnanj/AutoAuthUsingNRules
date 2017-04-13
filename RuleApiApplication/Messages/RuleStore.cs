@@ -23,7 +23,8 @@ namespace RuleApiApplication.Messages
             {
                 var rule = new DecisionRule
                 {
-                    Name = "Rule1 " + i,
+                    RuleId = i,
+                    Name = "Rule " + i,
                     ClientId = 22,
                     LobId = 53,
                     AuthTypeId = 2,
@@ -31,7 +32,11 @@ namespace RuleApiApplication.Messages
                     ProcedureCodes = procedureCodes,
                     VendorProviderSpecialityCodes = vendorProviderSpecialityCodes,
                     PlaceOfService = "Hospital " + i,
-                    ReviewTypeId = i
+                    ReviewTypeId = i,
+                    ApprovalRationale = "Diagnosis match",
+                    ApprovalReasonId = i,
+                    ApprovedPayLevelId = i,
+                    DecisionTypeId = i
                 };
 
                 var ageRule = new DecisionRule

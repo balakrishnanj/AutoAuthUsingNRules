@@ -2,6 +2,7 @@
 {
     public class DecisionRuleRequest
     {
+        public int ReviewId { get; set; }
         public int ClientId { get; set; }
         public int LobId { get; set; }
         public int AuthTypeId { get; set; }
