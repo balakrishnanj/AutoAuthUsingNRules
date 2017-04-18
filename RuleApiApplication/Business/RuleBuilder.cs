@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Web.Http.Results;
 using NRules.RuleModel;
 using RuleApiApplication.Messages;
 
@@ -34,10 +33,6 @@ namespace RuleApiApplication.Business
                 .AppendRules(decisionRule);
 
             autoAuthorizationPattern.Condition(autoAuthExpression);
-            //Expression<Action<IContext, DecisionRuleRequest>> result =
-            //    (ctx, autoAuthContract) => 
-            //    new RuleEngine().WhenRuleFires(ctx, decisionRule, autoAuthContract);
-            //builder.RightHandSide().Action(result);
             return builder.Build();
         }
     }

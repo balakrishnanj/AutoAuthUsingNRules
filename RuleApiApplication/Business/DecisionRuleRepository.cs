@@ -7,18 +7,21 @@ namespace RuleApiApplication.Business
 {
     public class DecisionRuleRepository : IRuleRepository
     {
+        public static List<IRuleSet> RuleSets { get; set; }
         public IEnumerable<IRuleSet> GetRuleSets()
         {
-            return new List<IRuleSet> { DecisionRulesetStore.Rules };
-        }
+            var result = RuleStore.Rules.GroupBy(r => new { r.ClientId, r.LobId });
+            RuleSets = new List<IRuleSet>();
 
-        public static void LoadRuleSets()
-        {
-            DecisionRulesetStore.Rules = new RuleSet("Test");
-            var ruleDefinitions = RuleStore
-                .Rules
-                .Select(RuleBuilder.Build).ToList();
-            DecisionRulesetStore.Rules.Add(ruleDefinitions);
+            foreach (var group in result)
+            {
+                var ruleSetName = "AutoDecision_" + group.Key.ClientId + "_" + group.Key.LobId;
+                var ruleSet = new RuleSet(ruleSetName);
+                var ruleDefinitions = group.Select(RuleBuilder.Build).ToList();
+                ruleSet.Add(ruleDefinitions);
+                RuleSets.Add(ruleSet);
+            }
+            return RuleSets;
         }
     }
 }

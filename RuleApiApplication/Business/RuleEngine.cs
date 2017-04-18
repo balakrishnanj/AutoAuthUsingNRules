@@ -1,47 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NRules;
 using NRules.Diagnostics;
-using NRules.RuleModel;
 using RuleApiApplication.Messages;
 
 namespace RuleApiApplication.Business
 {
     public class RuleEngine
     {
-        private readonly List<DecisionRuleResponse> _decisionRuleResponses = new List<DecisionRuleResponse>();
-        public async Task ExecuteRuleAsync(DecisionRuleRequest autoAuthRequest)
-        {
-            await Task.Factory.StartNew(() =>
-            {
-                var sessionFactory = new DecisionRuleRepository().Compile();
-                var session = sessionFactory.CreateSession();
-                session.Insert(autoAuthRequest);
-                session.Fire();
-            });
-        }
-
-        //public void WhenRuleFires(IContext context, DecisionRule decisionRule, DecisionRuleRequest request)
-        //{
-        //    Trace.WriteLine($"Success. Done executing rule {decisionRule.Name}");
-        //    _decisionRuleResponses = _decisionRuleResponses ?? new List<DecisionRuleResponse>();
-        //    _decisionRuleResponses.Add(new DecisionRuleResponse
-        //    {
-        //        ReviewId = request.ReviewId,
-        //        ApprovedPayLevelId = decisionRule.ApprovedPayLevelId,
-        //        ApprovalReasonId = decisionRule.ApprovalReasonId,
-        //        DecisionTypeId = decisionRule.DecisionTypeId,
-        //        RuleId = decisionRule.RuleId,
-        //        ApprovalRationale = decisionRule.ApprovalRationale ?? string.Empty
-        //    });
-        //}
-
+        private List<DecisionRuleResponse> _decisionRuleResponses;
         public List<DecisionRuleResponse> ExecuteRule(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
             if (autoAuthorizationDtos == null) throw new ArgumentNullException();
@@ -68,8 +38,7 @@ namespace RuleApiApplication.Business
                 {
                     gr.ForEach(r =>
                     {
-                        var task = Task.Factory.StartNew(() => FireRule(r));
-                        tasksList.Add(task);
+                        tasksList.Add(Task.Factory.StartNew(() => FireRule(r)));
                     });
                 });
                Task.WaitAll(tasksList.ToArray());
@@ -83,7 +52,10 @@ namespace RuleApiApplication.Business
 
         private void FireRule(DecisionRuleRequest r)
         {
-            var session = DecisionRuleBootstrapper.RuleSets["Test"].CreateSession();
+            //var ruleStore = "{ ClientId = "+r.ClientId+", LobId = "+r.LobId+" }";
+            //var ruleStore = "{ ClientId = 2, LobId = 71 }";
+            var ruleStore = "AutoDecision_" + r.ClientId + "_" + r.LobId;
+            var session = DecisionRuleBootstrapper.RuleSets[ruleStore].CreateSession();
             session.Events.RuleFiredEvent += OnRuleFiredEvent;
             session.Insert(r);
             session.Fire(1);
@@ -93,18 +65,19 @@ namespace RuleApiApplication.Business
         {
             Trace.WriteLine($"Rule fired {e.Rule.Name}");
             var fact = (DecisionRuleRequest)e.Facts.First().Value;
-            var rule = e.Rule.Properties;
+            var ruleProperties = e.Rule.Properties;
            
-            var data = new DecisionRuleResponse
+            _decisionRuleResponses = _decisionRuleResponses ?? new List<DecisionRuleResponse>();
+
+            _decisionRuleResponses.Add(new DecisionRuleResponse
             {
                 ReviewId = fact.ReviewId,
-                ApprovedPayLevelId = (int?)rule["ApprovedPayLevelId"],
-                ApprovalReasonId = (int)rule["ApprovalReasonId"],
-                DecisionTypeId = (int)rule["DecisionTypeId"],
-                RuleId = (int)rule["RuleId"],
-                ApprovalRationale = (string)rule["ApprovalRationale"]
-            };
-            _decisionRuleResponses.Add(data);
+                ApprovedPayLevelId = (int?)ruleProperties["ApprovedPayLevelId"],
+                ApprovalReasonId = (int)ruleProperties["ApprovalReasonId"],
+                DecisionTypeId = (int)ruleProperties["DecisionTypeId"],
+                RuleId = (int)ruleProperties["RuleId"],
+                ApprovalRationale = (string)ruleProperties["ApprovalRationale"]
+            });
         }
     }
 }

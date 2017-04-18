@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NRules;
+using RuleApiApplication.Messages;
 
 namespace RuleApiApplication.Business
 {
@@ -10,9 +11,12 @@ namespace RuleApiApplication.Business
         public static void Boostarp()
         {
             RuleSets = new Dictionary<string, ISessionFactory>();
-            DecisionRuleRepository.LoadRuleSets();
             var ruleFactory = new DecisionRuleRepository().Compile();
-            RuleSets.Add("Test", ruleFactory);
+            var ruleSets = DecisionRuleRepository.RuleSets;
+            foreach (var ruleSet in ruleSets)
+            {
+                RuleSets.Add(ruleSet.Name, ruleFactory);
+            }
         }
     }
 }
