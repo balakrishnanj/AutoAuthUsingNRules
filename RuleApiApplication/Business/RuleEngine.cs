@@ -39,6 +39,7 @@ namespace RuleApiApplication.Business
                     gr.ForEach(r =>
                     {
                         tasksList.Add(Task.Factory.StartNew(() => FireRule(r)));
+                        //tasksList.Add(FireRuleAsync(r));
                     });
                 });
                Task.WaitAll(tasksList.ToArray());
@@ -52,15 +53,14 @@ namespace RuleApiApplication.Business
 
         private void FireRule(DecisionRuleRequest r)
         {
-            //var ruleStore = "{ ClientId = "+r.ClientId+", LobId = "+r.LobId+" }";
-            //var ruleStore = "{ ClientId = 2, LobId = 71 }";
             var ruleStore = "AutoDecision_" + r.ClientId + "_" + r.LobId;
             var session = DecisionRuleBootstrapper.RuleSets[ruleStore].CreateSession();
             session.Events.RuleFiredEvent += OnRuleFiredEvent;
+
             session.Insert(r);
             session.Fire(1);
         }
-
+        
         private void OnRuleFiredEvent(object sender, AgendaEventArgs e)
         {
             Trace.WriteLine($"Rule fired {e.Rule.Name}");
