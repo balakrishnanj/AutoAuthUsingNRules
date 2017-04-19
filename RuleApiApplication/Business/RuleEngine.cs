@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using NRules;
 using NRules.Diagnostics;
 using RuleApiApplication.Messages;
 
@@ -11,7 +10,7 @@ namespace RuleApiApplication.Business
 {
     public class RuleEngine
     {
-        private List<DecisionRuleResponse> _decisionRuleResponses;
+        private List<DecisionRuleResponse> _decisionRuleResponses = new List<DecisionRuleResponse>();
         public List<DecisionRuleResponse> ExecuteRule(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
             if (autoAuthorizationDtos == null) throw new ArgumentNullException();
@@ -27,27 +26,27 @@ namespace RuleApiApplication.Business
         public List<DecisionRuleResponse> ExecuteRuleParllel(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
             if (autoAuthorizationDtos == null) throw new ArgumentNullException();
+            var tasksList = new List<Task>();
             if (autoAuthorizationDtos.Count > 5)
             {
-                var groupedDtos = autoAuthorizationDtos.Select((dto, index) => new {dto, index})
-                    .GroupBy(x => x.index/5)
+                var groupedDtos = autoAuthorizationDtos.Select((dto, index) => new { dto, index })
+                    .GroupBy(x => x.index / 5)
                     .Select(x => x.Select(y => y.dto).ToList())
                     .ToList();
-                var tasksList = new List<Task>();
                 groupedDtos.ForEach(gr =>
                 {
                     gr.ForEach(r =>
                     {
                         tasksList.Add(Task.Factory.StartNew(() => FireRule(r)));
-                        //tasksList.Add(FireRuleAsync(r));
-                    });
+                     });
                 });
-               Task.WaitAll(tasksList.ToArray());
             }
             else
             {
                 autoAuthorizationDtos.ForEach(FireRule);
             }
+
+            Task.WaitAll(tasksList.ToArray());
             return _decisionRuleResponses;
         }
 
@@ -67,8 +66,6 @@ namespace RuleApiApplication.Business
             var fact = (DecisionRuleRequest)e.Facts.First().Value;
             var ruleProperties = e.Rule.Properties;
            
-            _decisionRuleResponses = _decisionRuleResponses ?? new List<DecisionRuleResponse>();
-
             _decisionRuleResponses.Add(new DecisionRuleResponse
             {
                 ReviewId = fact.ReviewId,
@@ -78,6 +75,7 @@ namespace RuleApiApplication.Business
                 RuleId = (int)ruleProperties["RuleId"],
                 ApprovalRationale = (string)ruleProperties["ApprovalRationale"]
             });
+            Trace.WriteLine($"Rule fired {e.Rule.Name} complete");
         }
     }
 }

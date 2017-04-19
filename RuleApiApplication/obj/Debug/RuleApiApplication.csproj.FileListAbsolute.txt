@@ -274,9 +274,9 @@ C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Microsoft.Owin.Security.G
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\System.Web.Http.Owin.xml
-C:\Learning\AutoAuthUsingNRules\RuleApiApplication\obj\Debug\RuleApiApplication.csprojResolveAssemblyReference.cache
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\obj\Debug\RuleApiApplication.dll
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\obj\Debug\RuleApiApplication.pdb
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Dapper.dll
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Dapper.pdb
 C:\Learning\AutoAuthUsingNRules\RuleApiApplication\bin\Dapper.xml
+C:\Learning\AutoAuthUsingNRules\RuleApiApplication\obj\Debug\RuleApiApplication.csprojResolveAssemblyReference.cache
