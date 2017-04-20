@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Web.Helpers;
 using Dapper;
 using Newtonsoft.Json;
 using RuleApiApplication.Messages;
@@ -12,31 +11,31 @@ namespace RuleApiApplication.Repositories
 {
     public interface IRulesRepository
     {
-        IReadOnlyCollection<DecisionRule> Get(int clientId, int lobId);
+        IReadOnlyCollection<DecisionRule> Get();
     }
     public class RulesRepository : IRulesRepository
     {
-        public IReadOnlyCollection<DecisionRule> Get(int clientId, int lobId)
+        public IReadOnlyCollection<DecisionRule> Get()
         {
             var decisionRules = new List<DecisionRule>();
             var connectionString =
                 "data source=.;initial catalog=UtilizationMgmt;Integrated Security=true;persist security info=True";
-            //var getClientLobAutoDecisionSql = "SELECT JSON as [Rule] " +
-            //                                  "FROM [UtilizationMgmt].[UMRef].[ClientLOBAutoDecision] cla " +
-            //                                  "JOIN[UtilizationMgmt].[UMRef].[AutoDecisionRule] adr " +
-            //                                  "ON  cla.RuleKey = adr.RuleKey " +
-            //                                  "WHERE cla.ClientId = @clientId AND cla.LOBKey = @lobId AND cla.IsAutoDecisionEnabled = 1";
 
-            var getClientLobAutoDecisionSql = "SELECT JSON as [Rule] " +
-                                              "FROM [UtilizationMgmt].[UMRef].[AutoDecisionRule] adr" ;
+            var getClientLobAutoDecisionSql = "SELECT [RuleKey] as RuleId ,[Rule] as RuleName ,[IsActive]  ,[JSON] as [RuleJson] ,[ResponseJSON] as ResponseJson " +
+                                              "FROM[UtilizationMgmt].[UMRef].[AutoDecisionRule] WHERE IsActive = 1";
 
 
             using (var dbConnection = GetConnection(connectionString))
             {
-                var rules = dbConnection.Query<string>(getClientLobAutoDecisionSql, new { clientId, lobId }).ToList();
-                if (rules.Count > 0)
+                var rules = dbConnection.Query<DecisionRule>(getClientLobAutoDecisionSql).ToList();
+                foreach (var r in rules)
                 {
-                    decisionRules.AddRange(rules.Select(JsonConvert.DeserializeObject<DecisionRule>));
+                    var result = JsonConvert.DeserializeObject<DecisionRule>(r.RuleJson);
+                    result.RuleName = r.RuleName;
+                    result.RuleId = r.RuleId;
+                    result.ResponseJson = r.ResponseJson;
+                    result.RuleJson = r.RuleJson;
+                    decisionRules.Add(result);
                 }
             }
             return decisionRules.AsReadOnly();

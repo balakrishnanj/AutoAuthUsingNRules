@@ -8,7 +8,7 @@ namespace RuleApiApplication.Rules
     {
         public Expression<Func<DecisionRuleRequest, bool>> Build(DecisionRule rule)
         {
-            if (!rule.ReviewTypeId.HasValue)
+            if (rule.ReviewTypeId.HasValue)
             {
                 return autoAuthContract => autoAuthContract.ReviewTypeId == rule.ReviewTypeId;
             }

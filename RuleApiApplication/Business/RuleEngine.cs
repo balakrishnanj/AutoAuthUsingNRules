@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NRules.Diagnostics;
 using RuleApiApplication.Messages;
 
@@ -11,17 +12,6 @@ namespace RuleApiApplication.Business
     public class RuleEngine
     {
         private List<DecisionRuleResponse> _decisionRuleResponses = new List<DecisionRuleResponse>();
-        public List<DecisionRuleResponse> ExecuteRule(List<DecisionRuleRequest> autoAuthorizationDtos)
-        {
-            if (autoAuthorizationDtos == null) throw new ArgumentNullException();
-            autoAuthorizationDtos.ForEach(r =>
-            {
-                var session = DecisionRuleBootstrapper.RuleSets["Test"].CreateSession();
-                session.Insert(r);
-                session.Fire(1);
-            });
-            return _decisionRuleResponses;
-        }
 
         public List<DecisionRuleResponse> ExecuteRuleParllel(List<DecisionRuleRequest> autoAuthorizationDtos)
         {
@@ -38,7 +28,7 @@ namespace RuleApiApplication.Business
                     gr.ForEach(r =>
                     {
                         tasksList.Add(Task.Factory.StartNew(() => FireRule(r)));
-                     });
+                    });
                 });
             }
             else
@@ -47,6 +37,7 @@ namespace RuleApiApplication.Business
             }
 
             Task.WaitAll(tasksList.ToArray());
+            Trace.WriteLine("Returning response");
             return _decisionRuleResponses;
         }
 
@@ -59,22 +50,20 @@ namespace RuleApiApplication.Business
             session.Insert(r);
             session.Fire(1);
         }
-        
+
         private void OnRuleFiredEvent(object sender, AgendaEventArgs e)
         {
             Trace.WriteLine($"Rule fired {e.Rule.Name}");
             var fact = (DecisionRuleRequest)e.Facts.First().Value;
             var ruleProperties = e.Rule.Properties;
-           
-            _decisionRuleResponses.Add(new DecisionRuleResponse
-            {
-                ReviewId = fact.ReviewId,
-                ApprovedPayLevelId = (int?)ruleProperties["ApprovedPayLevelId"],
-                ApprovalReasonId = (int)ruleProperties["ApprovalReasonId"],
-                DecisionTypeId = (int)ruleProperties["DecisionTypeId"],
-                RuleId = (int)ruleProperties["RuleId"],
-                ApprovalRationale = (string)ruleProperties["ApprovalRationale"]
-            });
+
+            var decisionRuleResponse = JsonConvert.DeserializeObject<DecisionRuleResponse>
+                                            (ruleProperties["ResponseJson"] as string);
+            decisionRuleResponse.ReviewId = fact.ReviewId;
+            decisionRuleResponse.RuleId = (int)ruleProperties["RuleId"];
+
+            _decisionRuleResponses.Add(decisionRuleResponse);
+
             Trace.WriteLine($"Rule fired {e.Rule.Name} complete");
         }
     }

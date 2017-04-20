@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using RuleApiApplication.CustomAttributes;
 
 namespace RuleApiApplication.Messages
 {
     public class DecisionRule
     {
-        public string Name { get; set; }
         public int ClientId { get; set; }
         public int LobId { get; set; }
         public int AuthTypeId { get; set; }
@@ -20,10 +20,11 @@ namespace RuleApiApplication.Messages
         public bool? IsVendorProviderInNetwork { get; set; }
         public int? ReviewTypeId { get; set; }
         public int? MaxUnits { get; set; }
+        [RuleProperty]
         public int RuleId { get; set; }
-        public int DecisionTypeId { get; set; }
-        public int ApprovalReasonId { get; set; }
-        public int? ApprovedPayLevelId { get; set; }
-        public string ApprovalRationale { get; set; }
+        [RuleProperty]
+        public string ResponseJson { get; set; }
+        public string RuleJson { get; set; }
+        public string RuleName { get; set; }
     }
 }
